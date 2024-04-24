@@ -1,0 +1,49 @@
+pipeline {
+    agent {
+        docker { image "python:3.11" }
+    }
+    stages {
+
+        stage("Provision Infrastructure") {
+            steps {
+                sh 'terraform init'
+                sh 'terraform validate'
+                sh 'terraform plan'
+                sh 'terraform apply -auto-approve'
+            }
+        }
+
+        stage("Configure Infrastructure") {
+            steps {
+                sh 'ansible-playbook'
+            }
+        }
+
+        stage("Install Dependencies") {
+            steps {
+                sh 'pip3 install -r requirements.txt'
+            }
+        }
+
+        stage("Test") {
+            steps {
+                sh 'python3 -m coverage run -m pytest'
+                sh 'python3 -m coverage xml'
+                stash includes: 'coverage.xml', name: 'COVERAGE_XML'
+            }
+        }
+
+        stage("Build") {
+            steps {
+                // TODO
+            }
+        }
+
+        stage("Deploy") {
+            steps {
+                // TODO
+            }
+        }
+
+    }
+}
