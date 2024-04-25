@@ -14,3 +14,10 @@ Host: http://localhost:8080
 Username: admin
 Password: password
 Initial password can be found at jenkins-data/var/jenkins_home/secrets/initialAdminPassword
+
+## Artifactory 
+
+Host: http://localhost:8082
+Username: admin
+Initial Password: password
+Password: Password1

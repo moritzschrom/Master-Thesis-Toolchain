@@ -10,9 +10,29 @@ pipeline {
 
     environment {
         GITEA_URL = "http://gitea:3000"
+        ARTIFACTORY_URL = "http://artifactory:8082"
     }
 
     stages {
+        stage("Create Artifactory Project") {
+            steps {
+                withCredentials([string(credentialsId: "ARTIFACTORY_TOKEN", variable: "TOKEN")]) {
+                    sh '''curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ''' + TOKEN + '''" -d '{"project_key":"''' + PROJECT + '''", "display_name":"''' + PROJECT + '''", "admin_privileges": {"manage_members":true,"manage_resources":true,"index_resources":true},"storage_quota_bytes": -1}' $ARTIFACTORY_URL/access/api/v1/projects'''
+                }
+            }
+        }
+
+        stage("Create Artifactory Repository") {
+            environment {
+                KEY = "${PROJECT}-${COMPONENT}-local"
+            }
+            steps {
+                withCredentials([string(credentialsId: "ARTIFACTORY_TOKEN", variable: "TOKEN")]) {
+                    sh '''curl -X PUT -H "Content-Type: application/json" -H "Authorization: Bearer ''' + TOKEN + '''" -d '{"projectKey":"''' + PROJECT + '''", "key":"''' + KEY + '''", "rclass": "local"}' $ARTIFACTORY_URL/api/repositories/$KEY'''
+                }
+            }
+        }
+
         stage("Create Gitea Organization") {
             steps {
                 withCredentials([usernameColonPassword(credentialsId: "GITEA_CREDENTIALS", variable: "USERPASS")]) {

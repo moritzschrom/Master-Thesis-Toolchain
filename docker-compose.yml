@@ -3,6 +3,17 @@ networks:
     external: false
 
 services:
+
+  artifactory:
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.77.5
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+    networks:
+      - toolchain
+    volumes:
+      - ./artifactory/var/:/var/opt/jfrog/artifactory
+
   gitea:
     image: gitea/gitea:1.21.10
     container_name: gitea

@@ -1,42 +1,37 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'python:3.11' }
+    }
 
     stages {
         
-        /*
-        stage('Test1') {
-            agent {
-                docker { image 'node:20.11.1-alpine3.19' }
-            }
+        stage('Install Dependencies') {
             steps {
-                sh 'node --version'
-            }
-        }
-        
-        stage("Provision Infrastructure") {
-            agent {
-                docker { image 'hashicorp/terraform:latest' }
-            }
-            steps {
-                sh 'terraform --version'
-                sh 'terraform validate'
-                sh 'terraform plan'
-                sh 'terraform apply -auto-approve'
+                withEnv(["HOME=${env.WORKSPACE}"]) {
+                    sh 'pip3 install -r requirements.txt'
+                }
             }
         }
 
-        stage("Configure Infrastructure") {
+        stage('Test') {
             steps {
-                sh 'ansible-playbook'
+                withEnv(["HOME=${env.WORKSPACE}"]) {
+                    sh 'python3 -m pytest'
+                }
             }
         }
-        */
 
-        stage("Test") {
-            agent { image: 'python:3.11' }
+        stage('Build') {
             steps {
-                sh 'python3 run -m pytest'
+                sh 'echo Build'
             }
         }
+
+        stage('Publish') {
+            steps {
+                sh 'echo Publish'
+            }
+        }
+
     }
 }
