@@ -1,0 +1,33 @@
+pipeline {
+
+    agent any
+
+    parameters {
+        string(name: "PROJECT", defaultValue: "my-project", description: "Project key identifier")
+        string(name: "COMPONENT", defaultValue: "my-component", description: "Component key identifier")
+        choice(name: "TEMPLATE", choices: ["python-template"], description: "Desired template that fits the tech stack for your application")
+    }
+
+    environment {
+        GITEA_URL = "http://gitea:3000"
+    }
+
+    stages {
+        stage("Create Gitea Organization") {
+            steps {
+                withCredentials([usernameColonPassword(credentialsId: "GITEA_CREDENTIALS", variable: "USERPASS")]) {
+                    sh '''curl -H "Content-Type: application/json" -d '{"username":"$PROJECT"}' -u $USERPASS $GITEA_URL/api/v1/orgs'''
+                }
+            }
+        }
+
+        stage("Create Gitea Repository") {
+            steps {
+                sh "echo $COMPONENT"
+                withCredentials([usernameColonPassword(credentialsId: "GITEA_CREDENTIALS", variable: "USERPASS")]) {
+                    sh '''curl -H "Content-Type: application/json" -d '{"name":"$COMPONENT", "owner": "$PROJECT"}' -u $USERPASS $GITEA_URL/api/v1/repos/gitea/$TEMPLATE/generate'''
+                }
+            }
+        }
+    }
+}
