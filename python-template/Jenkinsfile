@@ -1,12 +1,24 @@
 pipeline {
-    agent {
-        docker { image "python:3.11" }
-    }
-    stages {
+    agent any
 
-        stage("Provision Infrastructure") {
+    stages {
+        
+        /*
+        stage('Test1') {
+            agent {
+                docker { image 'node:20.11.1-alpine3.19' }
+            }
             steps {
-                sh 'terraform init'
+                sh 'node --version'
+            }
+        }
+        
+        stage("Provision Infrastructure") {
+            agent {
+                docker { image 'hashicorp/terraform:latest' }
+            }
+            steps {
+                sh 'terraform --version'
                 sh 'terraform validate'
                 sh 'terraform plan'
                 sh 'terraform apply -auto-approve'
@@ -18,32 +30,13 @@ pipeline {
                 sh 'ansible-playbook'
             }
         }
-
-        stage("Install Dependencies") {
-            steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
+        */
 
         stage("Test") {
+            agent { image: 'python:3.11' }
             steps {
-                sh 'python3 -m coverage run -m pytest'
-                sh 'python3 -m coverage xml'
-                stash includes: 'coverage.xml', name: 'COVERAGE_XML'
+                sh 'python3 run -m pytest'
             }
         }
-
-        stage("Build") {
-            steps {
-                // TODO
-            }
-        }
-
-        stage("Deploy") {
-            steps {
-                // TODO
-            }
-        }
-
     }
 }

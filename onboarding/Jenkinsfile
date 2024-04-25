@@ -16,17 +16,33 @@ pipeline {
         stage("Create Gitea Organization") {
             steps {
                 withCredentials([usernameColonPassword(credentialsId: "GITEA_CREDENTIALS", variable: "USERPASS")]) {
-                    sh '''curl -H "Content-Type: application/json" -d '{"username":"$PROJECT"}' -u $USERPASS $GITEA_URL/api/v1/orgs'''
+                    sh '''curl -X POST -H "Content-Type: application/json" -d '{"username":"''' + PROJECT + '''"}' -u $USERPASS $GITEA_URL/api/v1/orgs'''
                 }
             }
         }
 
         stage("Create Gitea Repository") {
             steps {
-                sh "echo $COMPONENT"
                 withCredentials([usernameColonPassword(credentialsId: "GITEA_CREDENTIALS", variable: "USERPASS")]) {
-                    sh '''curl -H "Content-Type: application/json" -d '{"name":"$COMPONENT", "owner": "$PROJECT"}' -u $USERPASS $GITEA_URL/api/v1/repos/gitea/$TEMPLATE/generate'''
+                    sh '''curl -X POST -H "Content-Type: application/json" -d '{"name":"''' + COMPONENT + '''", "owner": "''' + PROJECT + '''", "git_content": true}' -u $USERPASS $GITEA_URL/api/v1/repos/gitea/$TEMPLATE/generate'''
                 }
+            }
+        }
+
+        stage("Create Jenkins Pipeline") {
+            environment {
+                KEY = "${PROJECT}-${COMPONENT}"
+                REMOTE = "${GITEA_URL}/${PROJECT}/${COMPONENT}.git"
+            }
+            steps {
+                jobDsl scriptText: '''multibranchPipelineJob("''' + KEY + '''") {
+    branchSources {
+        git {
+            id("''' + KEY + '''")
+            remote("''' + REMOTE + '''")
+        }
+    }
+}'''
             }
         }
     }
