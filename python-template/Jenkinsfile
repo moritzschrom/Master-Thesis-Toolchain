@@ -5,6 +5,12 @@ pipeline {
 
     stages {
 
+        stage('Validate Revision') {
+            steps {
+                sh 'echo Validate Revision (e.g. with Pre Commit)'
+            }
+        }
+
         stage('Provision Infrastructure') {
             steps {
                 sh 'echo Provision Infrastructure (e.g. with Terraform)'
