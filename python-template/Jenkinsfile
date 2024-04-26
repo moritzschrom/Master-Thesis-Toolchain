@@ -4,6 +4,18 @@ pipeline {
     }
 
     stages {
+
+        stage('Provision Infrastructure') {
+            steps {
+                sh 'echo Provision Infrastructure (e.g. with Terraform)'
+            }
+        }
+
+        stage('Configure Infrastructure') {
+            steps {
+                sh 'echo Configure Infrastructure (e.g. with Ansible)'
+            }
+        }
         
         stage('Install Dependencies') {
             steps {
@@ -21,15 +33,39 @@ pipeline {
             }
         }
 
+        stage('Scan') {
+            steps {
+                sh 'echo Scan Code (e.g. with SonarQube)'
+            }
+        }
+
         stage('Build') {
             steps {
-                sh 'echo Build'
+                sh 'echo Build Image'
             }
         }
 
         stage('Publish') {
             steps {
-                sh 'echo Publish'
+                sh 'echo Publish Image'
+            }
+        }
+
+        stage('Deploy DEV') {
+            steps {
+                sh 'echo Deploy to DEV'
+            }
+        }
+
+        stage('Deploy FAT') {
+            steps {
+                sh 'echo Deploy to FAT'
+            }
+        }
+
+        stage('Deploy PROD') {
+            steps {
+                sh 'echo Deploy to PROD'
             }
         }
 

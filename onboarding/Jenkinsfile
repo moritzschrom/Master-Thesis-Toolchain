@@ -5,7 +5,7 @@ pipeline {
     parameters {
         string(name: "PROJECT", defaultValue: "my-project", description: "Project key identifier")
         string(name: "COMPONENT", defaultValue: "my-component", description: "Component key identifier")
-        choice(name: "TEMPLATE", choices: ["python-template"], description: "Desired template that fits the tech stack for your application")
+        choice(name: "TEMPLATE", choices: ["python-template", "java-vm-template", "java-docker-template", "java-cloud-template"], description: "Desired template that fits the tech stack for your application")
     }
 
     environment {
